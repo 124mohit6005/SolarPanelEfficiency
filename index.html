@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f7f2">
+  <meta name="description" content="Explore solar panel efficiency predictions using sunlight intensity and panel temperature.">
+  <title>SolarWise — Panel Efficiency Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="solar-dataset.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="SolarWise home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M16 3v4m0 18v4M3 16h4m18 0h4M6.8 6.8l2.9 2.9m12.6 12.6 2.9 2.9m0-18.4-2.9 2.9M9.7 22.3l-2.9 2.9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="16" r="6" fill="currentColor"/></svg>
+        </span>
+        <span>solar<span class="brand-light">wise</span></span>
+      </a>
+      <div class="topbar-right">
+        <span class="live-indicator"><span></span> MODEL READY</span>
+        <a class="top-link" href="#dataset">View dataset <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="intro-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span> SOLAR PERFORMANCE, MADE CLEAR</div>
+          <h1>Make every ray<br>of sunshine <span>count.</span></h1>
+          <p>Explore how sunlight and panel temperature shape efficiency. Adjust the conditions and get an instant estimate from your dataset.</p>
+        </div>
+        <div class="sun-art" aria-hidden="true">
+          <div class="sun-halo"></div>
+          <div class="sun-disc"></div>
+          <div class="sun-panel">
+            <div class="panel-grid"></div>
+          </div>
+          <div class="art-caption"><span class="art-dot"></span> POWERING BETTER DECISIONS</div>
+        </div>
+      </section>
+
+      <section class="dashboard" aria-label="Efficiency prediction dashboard">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow section-eyebrow">YOUR LIVE WORKSPACE</div>
+            <h2>Efficiency explorer</h2>
+          </div>
+          <div class="data-source"><span class="source-dot"></span><span id="source-name">Loading dataset…</span></div>
+        </div>
+
+        <div class="dashboard-grid">
+          <section class="card prediction-card" aria-labelledby="predict-title">
+            <div class="card-heading">
+              <div>
+                <span class="card-kicker">01 / CONDITIONS</span>
+                <h3 id="predict-title">Set your environment</h3>
+              </div>
+              <span class="icon-sun" aria-hidden="true">☼</span>
+            </div>
+            <p class="card-description">Move the sliders to explore a different set of conditions.</p>
+
+            <div class="control-group">
+              <div class="control-label">
+                <label for="irradiance">Sunlight intensity</label>
+                <output id="irradiance-output" for="irradiance">650 <span>W/m²</span></output>
+              </div>
+              <input id="irradiance" type="range" min="0" max="1200" step="10" value="650">
+              <div class="range-ends"><span>0 W/m²</span><span>1,200 W/m²</span></div>
+            </div>
+
+            <div class="control-group temperature-control">
+              <div class="control-label">
+                <label for="temperature">Panel temperature</label>
+                <output id="temperature-output" for="temperature">30 <span>°C</span></output>
+              </div>
+              <input id="temperature" type="range" min="-10" max="80" step="1" value="30">
+              <div class="range-ends"><span>−10 °C</span><span>80 °C</span></div>
+            </div>
+
+            <div class="prediction-result" aria-live="polite">
+              <div class="result-topline">
+                <span>ESTIMATED EFFICIENCY</span>
+                <span class="result-spark" aria-hidden="true">↗</span>
+              </div>
+              <div class="result-value"><span id="prediction-value">—</span><span class="percent">%</span></div>
+              <div class="result-foot">
+                <span id="prediction-context">Based on your dataset</span>
+                <span class="result-badge"><span></span> MODEL ESTIMATE</span>
+              </div>
+            </div>
+            <p id="range-warning" class="range-warning" hidden>These conditions are outside the dataset range. Treat this estimate as an extrapolation.</p>
+          </section>
+
+          <section class="card chart-card" aria-labelledby="chart-title">
+            <div class="card-heading chart-heading">
+              <div>
+                <span class="card-kicker">02 / MODEL VIEW</span>
+                <h3 id="chart-title">Efficiency by sunlight</h3>
+              </div>
+              <span class="chart-unit">EFFICIENCY <span>(%)</span></span>
+            </div>
+            <p class="card-description">Dataset observations and the model trend at your selected temperature.</p>
+            <div class="chart-wrap">
+              <canvas id="efficiency-chart" role="img" aria-label="Chart showing dataset efficiency observations and predicted efficiency across sunlight intensities"></canvas>
+            </div>
+            <div class="chart-legend">
+              <span><i class="legend-dot"></i> Dataset observations</span>
+              <span><i class="legend-line"></i> Model at <b id="chart-temperature">30 °C</b></span>
+              <span><i class="legend-ring"></i> Your conditions</span>
+            </div>
+          </section>
+        </div>
+
+        <section class="metrics-grid" aria-label="Model performance">
+          <div class="metric-card">
+            <div class="metric-icon metric-icon-green" aria-hidden="true">⌁</div>
+            <div><span class="metric-label">TRAINING RECORDS</span><strong id="record-count">—</strong><span class="metric-note">observations in dataset</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon metric-icon-yellow" aria-hidden="true">±</div>
+            <div><span class="metric-label">TEST MAE</span><strong><span id="mae-value">—</span><small> pp</small></strong><span class="metric-note">average held-out error</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon metric-icon-blue" aria-hidden="true">R²</div>
+            <div><span class="metric-label">TEST R-SQUARED</span><strong id="r2-value">—</strong><span class="metric-note">held-out fit score</span></div>
+          </div>
+          <div class="metric-card model-type-card">
+            <div class="metric-icon metric-icon-violet" aria-hidden="true">ƒx</div>
+            <div><span class="metric-label">PREDICTION MODEL</span><strong class="model-name">Polynomial</strong><span class="metric-note">trained in your browser</span></div>
+          </div>
+        </section>
+
+        <section class="card dataset-card" id="dataset" aria-labelledby="dataset-title">
+          <div class="dataset-heading">
+            <div>
+              <span class="card-kicker">03 / YOUR DATA</span>
+              <h3 id="dataset-title">Dataset &amp; model</h3>
+              <p class="card-description">The model learns from your records. Import a CSV to train it on your own measurements.</p>
+            </div>
+            <div class="dataset-actions">
+              <button class="button button-outline" id="download-button" type="button"><span aria-hidden="true">↓</span> Download CSV</button>
+              <label class="button button-primary" for="csv-upload"><span aria-hidden="true">↑</span> Import dataset</label>
+              <input id="csv-upload" type="file" accept=".csv,text/csv" hidden>
+            </div>
+          </div>
+          <div id="status-message" class="status-message" role="status" hidden></div>
+          <div class="dataset-note"><span class="note-icon" aria-hidden="true">i</span><span><strong>About this dataset:</strong> The included demonstration records are generated sample data, not field measurements. Import your measured CSV for project-specific predictions. Required columns: <code>irradiance_w_m2</code>, <code>temperature_c</code>, and <code>efficiency_pct</code>.</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>RECORD</th><th>SUNLIGHT INTENSITY</th><th>PANEL TEMPERATURE</th><th>EFFICIENCY</th></tr></thead>
+              <tbody id="dataset-rows"></tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span id="table-count">Showing latest records</span>
+            <button type="button" class="text-button" id="reset-button" hidden>Restore demo dataset</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer><span class="footer-brand">solar<span>wise</span></span><span>Understand the conditions. Unlock the potential.</span><span>ESTIMATES ARE FOR EXPLORATION ONLY</span></footer>
+  </div>
+</body>
+</html>
